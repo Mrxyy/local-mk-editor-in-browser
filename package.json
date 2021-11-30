@@ -1,0 +1,23 @@
+{
+  "name": "mk-editor",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@kangc/v-md-editor": "^2.3.12",
+    "codemirror": "^5.64.0",
+    "highlight.js": "^11.3.1",
+    "memo-ui": "^0.0.0",
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.2",
+    "@vue/compiler-sfc": "^3.0.5",
+    "typescript": "^4.1.3",
+    "vite": "^2.2.3",
+    "vue-tsc": "^0.0.24"
+  }
+}
