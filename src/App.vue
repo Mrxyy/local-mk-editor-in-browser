@@ -14,8 +14,18 @@
       <moButtons @click="createDir" size="small" type="outline">
         新建文件
       </moButtons>
-      <div class="m-2">
-        <v-md-editor v-model="text" height="70vh"></v-md-editor>
+      <div class="flex m-2">
+        <div class="p-2 border mr-2 rounded-l shadow ring-offset-1">
+          <moLeftListMenu
+            class="w-max"
+            :value="menuData"
+            :activeItem="[1, 0]"
+            :fileOpenHandler="fileOpenHandler"
+          ></moLeftListMenu>
+        </div>
+        <div class="w-full">
+          <v-md-editor v-model="text" height="70vh"></v-md-editor>
+        </div>
       </div>
     </moCard>
   </section>
@@ -33,6 +43,45 @@ export default defineComponent({
   data() {
     return {
       text: "mk-editor",
+      menuData: [
+        {
+          id: "memo-0",
+          name: "memo",
+          expand: true,
+          children: [
+            {
+              id: "memo-0-1",
+              name: "memo-0-1",
+              children: [
+                {
+                  id: "memo-0-1-1",
+                  name: "memo-0-1-1",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "memo-1",
+          children: [
+            {
+              name: "memo-1-0",
+            },
+          ],
+        },
+        {
+          name: "memo-2",
+          children: [
+            {
+              id: "memo-2-2",
+              name: "memo-2-2",
+            },
+          ],
+        },
+        {
+          name: "memo-3",
+        },
+      ],
       currentContext: {
         path: "/",
         fileName: "",
@@ -91,6 +140,9 @@ export default defineComponent({
       };
       toolFX();
     },
+    fileOpenHandler(v:any){
+      console.log(v);
+    }
   },
 });
 </script>

@@ -10,7 +10,7 @@
     "@kangc/v-md-editor": "^2.3.12",
     "codemirror": "^5.64.0",
     "highlight.js": "^11.3.1",
-    "memo-ui": "^0.0.0",
+    "memo-ui": "file:/Users/xiongyangyang/Desktop/dome/memo-ui",
     "vue": "^3.0.5"
   },
   "devDependencies": {
