@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@kangc/v-md-editor": "^2.3.12",
+    "@vue/compiler-dom": "^3.2.23",
     "codemirror": "^5.64.0",
     "highlight.js": "^11.3.1",
     "memo-ui": "file:/Users/xiongyangyang/Desktop/dome/memo-ui",

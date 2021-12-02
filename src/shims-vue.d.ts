@@ -1,5 +1,5 @@
 interface Window {
-  [properties:string]:any
+  [properties: string]: any
 }
 
 declare module '*.vue' {
@@ -14,3 +14,5 @@ declare const TEMPORARY: Number;
 declare module 'codemirror';
 declare module "@kangc*";
 declare module "memo-ui";
+
+type FileSystemHandle = any;
