@@ -3,6 +3,7 @@
         "text/plain",
         "text/html",
         "text/css",
-        "text/javascript"
+        "text/javascript",
+        "application/json"
     ]
 }

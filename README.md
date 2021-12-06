@@ -3,6 +3,7 @@
 ## 关于
 1.目前只支持markdown的文件的和编写。
 2.github：https://github.com/Mrxyy/local-mk-editor-in-browser。
+3.ui: [memo-ui](https://github.com/Mrxyy/memo-ui)
 
 ## 相似产品
 1.和 vscode for web 一样，使用system access api 和local file system 进行通信。
