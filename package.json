@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode development",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -11,7 +11,7 @@
     "@vue/compiler-dom": "^3.2.23",
     "codemirror": "^5.64.0",
     "highlight.js": "^11.3.1",
-    "memo-ui": "file:/Users/xiongyangyang/Desktop/dome/memo-ui",
+    "memo-ui": "0.0.3",
     "vue": "^3.0.5"
   },
   "devDependencies": {

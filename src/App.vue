@@ -10,6 +10,7 @@
 
     <moCard width="95%" padding="20px" class="mx-auto my-2">
       <moButtons class="mr-1" @click="openProject" size="small" type="outline">打开一个项目</moButtons>
+      <moButtons class="mr-1" color="danger" @click="deleteEntry" size="small" type="outline">删除文件夹</moButtons>
       <moButtons class="mr-1" @click="createDirectory" size="small" type="outline">新建文件夹</moButtons>
       <moButtons @click="createfile" size="small" type="outline">新建文件</moButtons>
       <div class="flex m-2">
@@ -44,25 +45,28 @@ interface MenuGenerator {
   expand?: boolean
   children?: Array<Ref<MenuGenerator>> | undefined | []
   entryHandler: FileSystemHandle
+  parent?:MenuGenerator
 }
 
 class MenuGenerator implements MenuGenerator {
-  constructor({ id = '', name, expand = false, children = undefined, entryHandler }: MenuGenerator) {
+  constructor({ id = '', name, expand = false, children = undefined, entryHandler,parent }: MenuGenerator) {
     this.id = id,
       this.name = name,
       this.expand = expand,
       this.children = children,
       this.entryHandler = entryHandler
+      this.parent = parent
   }
 }
 
-function getParamFromEntry(handler: FileSystemHandle): MenuGenerator {
+function getParamFromEntry(handler: FileSystemHandle,parent?:MenuGenerator): MenuGenerator {
   return {
     id: handler.name,
     name: handler.name,
     expand: false,
     children: handler.kind != "file" ? [] : undefined,
-    entryHandler: handler
+    entryHandler: handler,
+    parent:parent
   }
 }
 
@@ -78,6 +82,11 @@ export default defineComponent({
         fileObj: null,
       },
     };
+  },
+  computed:{
+    currentActive(){
+      return this.$refs.moLeftListMenu.currentActive
+    }
   },
   setup() {
     // const instance = getCurrentInstance();
@@ -136,11 +145,10 @@ export default defineComponent({
       const entryIterator = directoryHandle.entries();
       const toolFX = (parentDirectory: MenuGenerator) => {
         entryIterator.next().then((v: AsyncIterator) => {
-          console.log(v);
           if (!v.done) {
             const [name, handle] = v.value
-            console.log(getParamFromEntry(handle));
-            const menuItem: MenuGenerator = reactive(new MenuGenerator(getParamFromEntry(handle)));
+            console.log(getParamFromEntry(handle,menuGenerator.entryHandler));
+            const menuItem: MenuGenerator = reactive(new MenuGenerator(getParamFromEntry(handle,menuGenerator)));
             Array.isArray(parentDirectory.children) && (parentDirectory.children as Array<MenuGenerator>).push(menuItem)
             toolFX(parentDirectory);
           }
@@ -154,8 +162,28 @@ export default defineComponent({
       const fileData: File = await fileEntryHanlder.getFile();
       return fileData
     },
-    createDirectory() { },
-    createfile() { },
+    async createDirectory() {
+      const parentEntry = this.currentActive;
+      if (!parentEntry.children) {
+        return;
+      }
+      const folderName= window.prompt("输入文件夹名");
+      const directoryHandle = await parentEntry.entryHandler.getDirectoryHandle(folderName,{
+        create:true
+      })
+      parentEntry.children.push(reactive(new MenuGenerator(getParamFromEntry(directoryHandle))))
+    },
+    async createfile() {
+      const parentEntry = this.currentActive;
+      if (!parentEntry.children) {
+        return;
+      }
+      const FileName= window.prompt("输入文件名");
+      const fileHandler = await parentEntry.entryHandler.getFileHandle(FileName,{
+        create:true
+      })
+      parentEntry.children.push(reactive(new MenuGenerator(getParamFromEntry(fileHandler))))
+    },
     async fileOpenHandler(v: any) {
       const file: File = await this.openFile(v)
       let type = Reflect.ownKeys(mime).find((v) => {
@@ -164,7 +192,6 @@ export default defineComponent({
       if (!type) {
         type = /\.md$/g.test(file.name) ? 'text' : type
       }
-      type = 'text'
       switch (type) {
         case 'text':
           this.handleTextType(file)
@@ -181,25 +208,23 @@ export default defineComponent({
       this.openDirectory(v)
     },
     async save(text: string, html: string) {
-      console.log(this.$refs.moLeftListMenu.currentActive.entryHandler, text);
-      const ableWriteStream: { write: any } & WritableStream = await this.$refs.moLeftListMenu.currentActive.entryHandler.createWritable();
+      const ableWriteStream: { write: any } & WritableStream = await this.currentActive.entryHandler.createWritable();
       console.log(ableWriteStream)
       await ableWriteStream.write(text);
       await ableWriteStream.close();
-      FileSystemDirectoryHandle.removeEntry()
-      // async function saveFile() {
-      //   await ableWriteStream.write(text);
-      //   await ableWriteStream.close();
-      // }
-      // saveFile()
-      // console.log(await this.$refs.moLeftListMenu.currentActive.entryHandler.queryPermission({
-      //   mode: 'readwrite'
-      // }), await (await this.openFile(this.$refs.moLeftListMenu.currentActive)).text())
+      // FileSystemDirectoryHandle.removeEntry()
+    },
+    async deleteEntry(){
+      this.currentActive.parent.entryHandler.removeEntry(this.currentActive.entryHandler.name,{recursive:true}).then(()=>{
+        this.currentActive.parent.children.find((v:MenuGenerator,i:number)=>{
+          if(v === this.currentActive){
+            this.currentActive.parent.children.splice(i,1)
+          }
+          return v === this.currentActive;
+        }) //?bugger 直接赋值没有触发更新，当[]复制又可以
+      })
     }
   },
-  mounted() {
-    console.log(this.$refs.moLeftListMenu);
-  }
 });
 </script>
 
