@@ -190,7 +190,6 @@ export default defineComponent({
         entryIterator.next().then((v: AsyncIterator) => {
           if (!v.done) {
             const [name, handle] = v.value;
-            console.log(getParamFromEntry(handle, menuGenerator.entryHandler));
             const menuItem: MenuGenerator = reactive(
               new MenuGenerator(getParamFromEntry(handle, menuGenerator))
             );
@@ -221,7 +220,7 @@ export default defineComponent({
         }
       );
       parentEntry.children.push(
-        reactive(new MenuGenerator(getParamFromEntry(directoryHandle)))
+        reactive(new MenuGenerator(getParamFromEntry(directoryHandle,parentEntry)))
       );
     },
     async createfile() {
@@ -237,7 +236,7 @@ export default defineComponent({
         }
       );
       parentEntry.children.push(
-        reactive(new MenuGenerator(getParamFromEntry(fileHandler)))
+        reactive(new MenuGenerator(getParamFromEntry(fileHandler,parentEntry)))
       );
     },
     async fileOpenHandler(v: any) {
@@ -265,7 +264,6 @@ export default defineComponent({
       this.text = await file.text();
     },
     directoryOpenHandler(v: any) {
-      console.log(v);
       this.openDirectory(v);
     },
     async save(text: string, html: string) {
