@@ -13,5 +13,3 @@ declare const TEMPORARY: Number;
 
 declare module 'codemirror';
 declare module "@kangc*";
-
-type FileSystemHandle = any;

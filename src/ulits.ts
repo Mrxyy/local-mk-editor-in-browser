@@ -16,3 +16,25 @@ export function getfileSystemDirctroy(
         });
     });
 }
+
+export function getFileSystemEntry(
+    fs: FileSystemDirectoryEntry,
+    path: string,
+    fx: (fileEntry: FileSystemEntry) => any,
+    flag: FileSystemFlags = {}
+) {
+    fs.getFile(path, flag, fx)
+}
+
+export function createFileSystemEntry(
+    fs: FileSystemDirectoryEntry,
+    path: string,
+    fx: (fileEntry: FileSystemEntry) => any,
+    flag: FileSystemFlags = {
+        create: true,
+        exclusive: true
+    }
+) {
+    console.log(fx);
+    fs.getFile(path, flag, fx)
+}
