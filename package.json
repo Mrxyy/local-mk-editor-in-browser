@@ -14,6 +14,12 @@
     "memo-ui": "0.0.3",
     "vue": "^3.0.5"
   },
+  "engines": {
+    "node": "16"
+  },
+  "glitch": {
+    "projectType": "generated_static"
+  },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.2",
     "@vue/compiler-sfc": "^3.0.5",
