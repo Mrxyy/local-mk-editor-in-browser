@@ -79,27 +79,22 @@ export default defineComponent({
     navigator.webkitPersistentStorage.queryUsageAndQuota(
       (usedBytes: number, grantedBytes: number) => {
         // 检查主机使用和剩下
-        console.log("可使用的最大量 ", usedBytes, " 已经使用 ", grantedBytes, "bytes");
-        if (grantedBytes < requestedBytes) {
-          console.log("储存不够");
-        } else {
-          console.log("将请求", requestedBytes);
-          navigator.webkitPersistentStorage.requestQuota(
-            requestedBytes,
-            (grentedSzie: number) => {
-              console.log("授权大小", grentedSzie); // 授权大小
-              webkitRequestFileSystem(
-                PERSISTENT,
-                grantedBytes,
-                (fs: FileSystem) => {
-                  this.addSubProject(fs.root);
-                },
-                errorHandler
-              );
-            },
-            errorHandler
-          );
-        }
+        console.log("使用的量 ", usedBytes, " 剩余使用 ", grantedBytes, "bytes");
+        navigator.webkitPersistentStorage.requestQuota(
+          usedBytes + requestedBytes,
+          (grentedSzie: number) => {
+            console.log("授权大小", usedBytes, requestedBytes); // 授权大小
+            webkitRequestFileSystem(
+              PERSISTENT,
+              grantedBytes,
+              (fs: FileSystem) => {
+                this.addSubProject(fs.root);
+              },
+              errorHandler
+            );
+          },
+          errorHandler
+        );
       },
       errorHandler
     );

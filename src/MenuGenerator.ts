@@ -3,7 +3,7 @@ interface MenuGeneratorInterface {
     name: string;
     expand?: boolean;
     children?: Array<MenuGenerator> | undefined | [];
-    entryHandler?: FileSystemHandle;
+    entryHandler: FileSystemHandle;
     parent?: MenuGenerator;
 }
 
@@ -12,7 +12,7 @@ export class MenuGenerator implements MenuGeneratorInterface {
     name: string = ''
     expand?: boolean = false
     children?: Array<MenuGenerator> | undefined | [] = []
-    entryHandler?: FileSystemHandle = undefined
+    entryHandler: FileSystemHandle
     parent?: MenuGenerator = undefined
     constructor({
         id,
