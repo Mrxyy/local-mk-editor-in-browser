@@ -1,7 +1,7 @@
 # local-mk-editor-in-browser
 
 ## view
-+ [mk-editor](https://mk-editor.glitch.me/)
++ [local-mk-editor-in-browser](https://local-mk-editor-in-browser.glitch.me/)
 + [中国大陆](https://mypku.csb.app/)
 
 ## 关于

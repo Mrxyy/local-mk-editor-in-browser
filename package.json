@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode development",
-    "serve": "vite preview"
+    "start": "vite preview"
   },
   "dependencies": {
     "@kangc/v-md-editor": "^2.3.12",
