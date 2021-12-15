@@ -11,7 +11,7 @@
     "@vue/compiler-dom": "^3.2.23",
     "codemirror": "^5.64.0",
     "highlight.js": "^11.3.1",
-    "memo-ui": "0.0.3",
+    "memo-ui": "workspace:^0.0.3",
     "vue": "^3.0.5"
   },
   "engines": {

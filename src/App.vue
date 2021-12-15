@@ -9,10 +9,27 @@
     </div>-->
 
     <moCard width="95%" padding="20px" class="mx-auto my-2">
-      <moButtons class="mr-1" @click="openProject" size="small" type="outline">打开一个项目</moButtons>
-      <moButtons class="mr-1" color="danger" @click="deleteEntry" size="small" type="outline">删除文件夹</moButtons>
-      <moButtons class="mr-1" @click="createDirectory" size="small" type="outline">新建文件夹</moButtons>
-      <moButtons @click="createfile" size="small" type="outline">新建文件</moButtons>
+      <moButtons class="mr-1" @click="openProject" size="small" type="outline"
+        >打开一个项目</moButtons
+      >
+      <moButtons
+        class="mr-1"
+        color="danger"
+        @click="deleteEntry"
+        size="small"
+        type="outline"
+        >删除文件夹</moButtons
+      >
+      <moButtons
+        class="mr-1"
+        @click="createDirectory"
+        size="small"
+        type="outline"
+        >新建文件夹</moButtons
+      >
+      <moButtons @click="createfile" size="small" type="outline"
+        >新建文件</moButtons
+      >
       <div class="flex m-2">
         <div class="p-2 border mr-2 rounded-l shadow ring-offset-1 side-menu">
           <moLeftListMenu
@@ -24,7 +41,12 @@
           ></moLeftListMenu>
         </div>
         <div class="w-full">
-          <v-md-editor :mode="editMode" @save="save" v-model="text" height="70vh"></v-md-editor>
+          <v-md-editor
+            :mode="editMode"
+            @save="save"
+            v-model="text"
+            height="70vh"
+          ></v-md-editor>
         </div>
       </div>
     </moCard>
@@ -32,11 +54,8 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ComponentPublicInstance,
-  reactive,
-} from "vue";
+import { defineComponent, ComponentPublicInstance, reactive } from "vue";
+import { toast } from "memo-ui";
 import { MenuGenerator, getParamFromEntry } from "./MenuGenerator";
 import { errorHandler } from "./ulits";
 import mime from "./mime.json";
@@ -45,10 +64,10 @@ declare const navigator: any;
 declare const webkitRequestFileSystem: any;
 
 interface dataResult {
-  text: string,
-  menuData: Array<MenuGenerator>,
-  editMode: "edit" | "editable",
-  currentContext: Object
+  text: string;
+  menuData: Array<MenuGenerator>;
+  editMode: "edit" | "editable";
+  currentContext: Object;
 }
 
 export default defineComponent({
@@ -79,7 +98,13 @@ export default defineComponent({
     navigator.webkitPersistentStorage.queryUsageAndQuota(
       (usedBytes: number, grantedBytes: number) => {
         // 检查主机使用和剩下
-        console.log("使用的量 ", usedBytes, " 剩余使用 ", grantedBytes, "bytes");
+        console.log(
+          "使用的量 ",
+          usedBytes,
+          " 剩余使用 ",
+          grantedBytes,
+          "bytes"
+        );
         navigator.webkitPersistentStorage.requestQuota(
           usedBytes + requestedBytes,
           (grentedSzie: number) => {
@@ -105,7 +130,9 @@ export default defineComponent({
       const directoryHandle = await window.showDirectoryPicker();
       this.addSubProject(directoryHandle);
     },
-    addSubProject(directoryHandle: FileSystemDirectoryHandle | FileSystemDirectoryEntry) {
+    addSubProject(
+      directoryHandle: FileSystemDirectoryHandle | FileSystemDirectoryEntry
+    ) {
       const rootParameter = getParamFromEntry(directoryHandle);
       rootParameter.expand = true;
       const root: MenuGenerator = reactive(new MenuGenerator(rootParameter)); //不能使用 ref 因为 ref会进行对象转换，对比react ref
@@ -118,13 +145,17 @@ export default defineComponent({
         return;
       }
       const directoryHandle: FileSystemHandle = menuGenerator.entryHandler;
-      const entryIterator = (directoryHandle as FileSystemDirectoryHandle).entries();
+      const entryIterator = (
+        directoryHandle as FileSystemDirectoryHandle
+      ).entries();
       const toolFX = (parentDirectory: MenuGenerator) => {
         entryIterator.next().then((v) => {
           if (!v.done) {
             const [name, handle] = v.value;
             const menuItem = reactive<MenuGenerator>(
-              new MenuGenerator(getParamFromEntry(handle as FileSystemHandle, menuGenerator))
+              new MenuGenerator(
+                getParamFromEntry(handle as FileSystemHandle, menuGenerator)
+              )
             );
             Array.isArray(parentDirectory.children) &&
               (parentDirectory.children as Array<MenuGenerator>).push(menuItem);
@@ -137,7 +168,9 @@ export default defineComponent({
     },
     async openFile(menuGenerator: MenuGenerator): Promise<File> {
       const fileEntryHanlder: FileSystemHandle = menuGenerator.entryHandler;
-      const fileData: File = await (fileEntryHanlder as FileSystemFileHandle).getFile();
+      const fileData: File = await (
+        fileEntryHanlder as FileSystemFileHandle
+      ).getFile();
       return fileData;
     },
     async createDirectory() {
@@ -145,36 +178,50 @@ export default defineComponent({
       if (!parentEntry.children) {
         return;
       }
-      const folderName = window.prompt("输入文件夹名");
-      if (folderName) {
-        const directoryHandle: FileSystemDirectoryHandle = await (parentEntry.entryHandler as FileSystemDirectoryHandle).getDirectoryHandle(
-          folderName,
-          {
-            create: true,
+      toast.prompt({
+        text: "输入文件夹名",
+        onConfirm: async (folderName: string) => {
+          if (folderName) {
+            const directoryHandle: FileSystemDirectoryHandle = await (
+              parentEntry.entryHandler as FileSystemDirectoryHandle
+            ).getDirectoryHandle(folderName, {
+              create: true,
+            });
+            (parentEntry.children as Array<MenuGenerator>).push(
+              reactive<MenuGenerator>(
+                new MenuGenerator(
+                  getParamFromEntry(directoryHandle, parentEntry)
+                )
+              )
+            );
           }
-        );
-        (parentEntry.children as Array<MenuGenerator>).push(
-          reactive<MenuGenerator>(new MenuGenerator(getParamFromEntry(directoryHandle, parentEntry)))
-        );
-      }
+          return true;
+        },
+      });
     },
     async createfile() {
       const parentEntry = this.currentActive;
       if (!parentEntry.children) {
         return;
       }
-      const FileName = window.prompt("输入文件名");
-      if (FileName) {
-        const fileHandler: FileSystemFileHandle = await (parentEntry.entryHandler as FileSystemFileHandle).getFileHandle(
-          FileName,
-          {
-            create: true,
+      toast.prompt({
+        text: "输入文件名",
+        onConfirm: async (FileName: string) => {
+          if (FileName) {
+            const fileHandler: FileSystemFileHandle = await (
+              parentEntry.entryHandler as FileSystemFileHandle
+            ).getFileHandle(FileName, {
+              create: true,
+            });
+            (parentEntry.children as Array<MenuGenerator>).push(
+              reactive<MenuGenerator>(
+                new MenuGenerator(getParamFromEntry(fileHandler, parentEntry))
+              )
+            );
           }
-        );
-        (parentEntry.children as Array<MenuGenerator>).push(
-          reactive<MenuGenerator>(new MenuGenerator(getParamFromEntry(fileHandler, parentEntry)))
-        );
-      }
+          return true;
+        },
+      });
     },
     async fileOpenHandler(v: any) {
       const file: File = await this.openFile(v);
@@ -201,25 +248,32 @@ export default defineComponent({
       this.text = await file.text();
     },
     async save(text: string, html: string) {
-      const ableWriteStream = await (this.currentActive.entryHandler as FileSystemFileHandle).createWritable();
+      const ableWriteStream = await (
+        this.currentActive.entryHandler as FileSystemFileHandle
+      ).createWritable();
       console.log(ableWriteStream);
       await ableWriteStream.write(new Blob([text]));
-      await ableWriteStream.close && ableWriteStream.close();
+      (await ableWriteStream.close) && ableWriteStream.close();
       // FileSystemDirectoryHandle.removeEntry()
     },
     async deleteEntry() {
-      this.currentActive.parent && (this.currentActive.parent.entryHandler as FileSystemDirectoryHandle)
-        .removeEntry(this.currentActive.entryHandler.name, { recursive: true })
-        .then(() => {
-          this.currentActive.parent?.children && this.currentActive.parent.children.find(
-            (v: MenuGenerator, i: number) => {
-              if (v === this.currentActive) {
-                this.currentActive.parent?.children && this.currentActive.parent.children.splice(i, 1);
-              }
-              return v === this.currentActive;
-            }
-          ); //?bugger 直接赋值没有触发更新，当[]复制又可以
-        });
+      this.currentActive.parent &&
+        (this.currentActive.parent.entryHandler as FileSystemDirectoryHandle)
+          .removeEntry(this.currentActive.entryHandler.name, {
+            recursive: true,
+          })
+          .then(() => {
+            this.currentActive.parent?.children &&
+              this.currentActive.parent.children.find(
+                (v: MenuGenerator, i: number) => {
+                  if (v === this.currentActive) {
+                    this.currentActive.parent?.children &&
+                      this.currentActive.parent.children.splice(i, 1);
+                  }
+                  return v === this.currentActive;
+                }
+              ); //?bugger 直接赋值没有触发更新，当[]复制又可以
+          });
     },
   },
 });
