@@ -6,7 +6,7 @@
 
 ## 关于
 + 目前只支持markdown的文件的和编写。
-+ github：https://github.com/Mrxyy/local-mk-editor-in-browser。
++ github：https://github.com/Mrxyy/local-mk-editor-in-browser
 + ui: [memo-ui](https://github.com/Mrxyy/memo-ui)
 
 ## 相似产品
