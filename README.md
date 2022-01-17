@@ -2,7 +2,7 @@
 
 ## view
 + [local-mk-editor-in-browser](https://local-mk-editor-in-browser.glitch.me/)
-+ [中国大陆](https://mypku.csb.app/)
++ [中国大陆（不支持System-File-Entry）](https://mypku.csb.app/)
 
 ## 关于
 + 目前只支持markdown的文件的和编写。
