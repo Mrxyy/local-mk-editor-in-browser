@@ -24,7 +24,7 @@
 + 产品架构文档(system file,web stream,file system access)。
 + js console、html、图片、pdf 预览。
 
-## executeing
+## 执行中
 + excel 预览 done（testing～）
 + js console
 + 插拔架构完成
