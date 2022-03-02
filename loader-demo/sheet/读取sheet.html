@@ -1,0 +1,46 @@
+<body>
+    <style>
+        TABLE {
+            border-collapse: collapse;
+        }
+
+        TD {
+            border: 1px solid;
+        }
+    </style>
+    <div id="tavolo"></div>
+    <a href="" download="test.xls" id="boldID">bold</a>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script type="text/javascript">
+        // https://github.com/SheetJS/sheetjs
+        (async () => {
+            /* fetch and parse workbook -- see the fetch example for details */
+            const workbook = XLSX.read(await (await fetch("./test.xlsx")).arrayBuffer());
+
+            let output = [];
+            /* loop through the worksheet names in order */
+            workbook.SheetNames.forEach(name => {
+
+                /* generate HTML from the corresponding worksheets */
+                const worksheet = workbook.Sheets[name];
+                const html = XLSX.utils.sheet_to_html(worksheet,{editable:true});
+
+                /* add a header with the title name followed by the table */
+                output.push(`<H3>${name}</H3>${html}`);
+            });
+            /* write to the DOM at the end */
+            tavolo.innerHTML = output.join("\n");
+        })();
+        setTimeout(()=>{
+            var htmlstr = document.getElementById("tavolo").outerHTML;
+            var workbook = XLSX.read(htmlstr, {type:"string"});
+            console.log();
+            var arrayBuf = XLSX.write(workbook, {type:"array"})
+            var file = new File([arrayBuf], "test.xls", {
+                type: "application/vnd.ms-excel",
+            });
+            boldID.href= URL.createObjectURL(file)
+            console.log(URL.createObjectURL(file));
+        },1000)
+    </script>
+</body>

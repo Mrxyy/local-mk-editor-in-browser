@@ -9,27 +9,10 @@
     </div>-->
 
     <moCard width="95%" padding="20px" class="mx-auto my-2">
-      <moButtons class="mr-1" @click="openProject" size="small" type="outline"
-        >打开一个项目</moButtons
-      >
-      <moButtons
-        class="mr-1"
-        color="danger"
-        @click="deleteEntry"
-        size="small"
-        type="outline"
-        >删除文件夹</moButtons
-      >
-      <moButtons
-        class="mr-1"
-        @click="createDirectory"
-        size="small"
-        type="outline"
-        >新建文件夹</moButtons
-      >
-      <moButtons @click="createfile" size="small" type="outline"
-        >新建文件</moButtons
-      >
+      <moButtons class="mr-1" @click="openProject" size="small" type="outline">打开一个项目</moButtons>
+      <moButtons class="mr-1" color="danger" @click="deleteEntry" size="small" type="outline">删除文件夹</moButtons>
+      <moButtons class="mr-1" @click="createDirectory" size="small" type="outline">新建文件夹</moButtons>
+      <moButtons @click="createfile" size="small" type="outline">新建文件</moButtons>
       <div class="flex m-2">
         <div class="p-2 border mr-2 rounded-l shadow ring-offset-1 side-menu">
           <moLeftListMenu
@@ -41,12 +24,12 @@
           ></moLeftListMenu>
         </div>
         <div class="w-full">
-          <v-md-editor
-            :mode="editMode"
-            @save="save"
-            v-model="text"
-            height="70vh"
-          ></v-md-editor>
+          <v-md-editor :mode="editMode" @save="save" v-model="text" height="70vh"></v-md-editor>
+          <customEditor v-if="isUseCustomEditor">
+            <div class="p-2" v-if="currentContext.fileType === 'xlsx'">
+              <sheetEditor :value="currentContext.fileObj"></sheetEditor>
+            </div>
+          </customEditor>
         </div>
       </div>
     </moCard>
@@ -58,28 +41,41 @@ import { defineComponent, ComponentPublicInstance, reactive } from "vue";
 import { toast } from "memo-ui";
 import { MenuGenerator, getParamFromEntry } from "./MenuGenerator";
 import { errorHandler } from "./ulits";
+import customEditor from "./engines/index.vue";
 import mime from "./mime.json";
+
+import sheetEditor from "./engines/sheet/index.vue"
 
 declare const navigator: any;
 declare const webkitRequestFileSystem: any;
 
+interface CurrentContext {
+  fileType: string,
+  fileObj: File | null
+}
+
 interface dataResult {
   text: string;
   menuData: Array<MenuGenerator>;
-  editMode: "edit" | "editable";
-  currentContext: Object;
+  editMode: "edit" | "editable" | "preview";
+  isUseCustomEditor: boolean;
+  currentContext: CurrentContext;
 }
 
 export default defineComponent({
   name: "App",
+  components: {
+    customEditor,
+    sheetEditor
+  },
   data(): dataResult {
     return {
       text: "mk-editor",
       menuData: [],
+      isUseCustomEditor: false,
       currentContext: {
-        path: "/",
-        fileName: "",
-        fileObj: null,
+        fileType: "text",
+        fileObj: null
       },
       editMode: "edit",
     };
@@ -233,18 +229,31 @@ export default defineComponent({
         if (/\.md$/g.test(file.name)) {
           this.editMode = "editable";
         }
+      } else if (/\.xlsx$/g.test(file.name)) {
+        type = "xlsx";
+        this.isUseCustomEditor = true;
+        this.editMode = "editable";
       } else {
         this.editMode = "edit";
       }
+
+      this.currentContext.fileType = type as string;
+      this.currentContext.fileObj = file;
 
       switch (type) {
         case "text":
           this.handleTextType(file);
           break;
+        case "xlsx":
+          this.handleSheet(file);
+          break;
       }
       console.log(file, type ? type : file.type + "can't handle");
     },
+    async handleSheet(file: File) {
+    },
     async handleTextType(file: File) {
+      console.log(file)
       this.text = await file.text();
     },
     async save(text: string, html: string) {

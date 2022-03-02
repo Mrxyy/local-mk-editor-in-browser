@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="test"></div>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        const rows = [
+            { name: "George Washington", birthday: "1732-02-22" },
+            { name: "John Adams", birthday: "1735-10-19" },
+        ]
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
+        /* fix headers */
+        XLSX.utils.sheet_add_aoa(worksheet, [["Name", "Birthday"]], { origin: "A1" });
+
+        /* calculate column width */
+        const max_width = rows.reduce((w, r) => Math.max(w, r.name.length), 10);
+        worksheet["!cols"] = [{ wch: max_width }];
+
+        /* create an XLSX file and try to save to Presidents.xlsx */
+        XLSX.writeFile(workbook, "Presidents.xlsx");
+    </script>
+</body>
+
+</html>

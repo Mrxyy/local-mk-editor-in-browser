@@ -2,12 +2,12 @@
   "name": "mk-editor",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --force",
     "build": "vite build --mode development",
     "start": "vite preview"
   },
   "dependencies": {
-    "@kangc/v-md-editor": "^2.3.12",
+    "@kangc/v-md-editor": "2.3.12",
     "@vue/compiler-dom": "^3.2.23",
     "codemirror": "^5.64.0",
     "highlight.js": "^11.3.1",
