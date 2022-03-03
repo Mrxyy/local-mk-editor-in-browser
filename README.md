@@ -25,6 +25,6 @@
 + js console、html、图片、pdf 预览。
 
 ## 执行中
-+ excel 预览 done（testing～）
-+ js console
++ ~~excel 预览 done~~
++ js console 
 + 插拔架构完成
