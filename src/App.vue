@@ -26,8 +26,8 @@
         <div class="w-full">
           <v-md-editor :mode="editMode" @save="save" v-model="text" height="70vh"></v-md-editor>
           <customEditor v-if="isUseCustomEditor">
-            <div class="p-2" v-if="currentContext.fileType === 'xlsx'">
-              <sheetEditor :value="currentContext.fileObj"></sheetEditor>
+            <div class="p-4" v-if="currentContext.fileType === 'xlsx'">
+              <sheetEditor :value="currentContext.fileObj" ref="fileHandler"></sheetEditor>
             </div>
           </customEditor>
         </div>
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ComponentPublicInstance, reactive } from "vue";
+import { defineComponent, ComponentPublicInstance, reactive, nextTick } from "vue";
 import { toast } from "memo-ui";
 import { MenuGenerator, getParamFromEntry } from "./MenuGenerator";
 import { errorHandler } from "./ulits";
@@ -60,6 +60,10 @@ interface dataResult {
   editMode: "edit" | "editable" | "preview";
   isUseCustomEditor: boolean;
   currentContext: CurrentContext;
+}
+
+enum customMode {
+  PREVIEWANDEDITOR = "PREVIEWANDEDITOR"
 }
 
 export default defineComponent({
@@ -85,10 +89,6 @@ export default defineComponent({
       return (this.$refs as any).moLeftListMenu.currentActive;
     },
   },
-  setup() {
-    // const instance = getCurrentInstance();
-  },
-  // create FileSystem in browser:temp、trash...
   created() {
     var requestedBytes = 1024 * 1024 * 10; // 10MB
     navigator.webkitPersistentStorage.queryUsageAndQuota(
@@ -230,9 +230,11 @@ export default defineComponent({
           this.editMode = "editable";
         }
       } else if (/\.xlsx$/g.test(file.name)) {
-        type = "xlsx";
         this.isUseCustomEditor = true;
-        this.editMode = "editable";
+        type = "xlsx";
+        nextTick(() => {
+          this.handleCustomModeShow((this.$refs.fileHandler as any).editMode)
+        })
       } else {
         this.editMode = "edit";
       }
@@ -244,26 +246,33 @@ export default defineComponent({
         case "text":
           this.handleTextType(file);
           break;
-        case "xlsx":
-          this.handleSheet(file);
-          break;
       }
       console.log(file, type ? type : file.type + "can't handle");
+    },
+    handleCustomModeShow(mode: customMode) {
+      switch (mode) {
+        case (customMode.PREVIEWANDEDITOR):
+          this.editMode = "editable";
+          (document.querySelector(".v-md-editor__editor-wrapper") as HTMLElement).style.display = "none";
+          break
+      }
     },
     async handleSheet(file: File) {
     },
     async handleTextType(file: File) {
-      console.log(file)
       this.text = await file.text();
     },
     async save(text: string, html: string) {
       const ableWriteStream = await (
         this.currentActive.entryHandler as FileSystemFileHandle
       ).createWritable();
-      console.log(ableWriteStream);
-      await ableWriteStream.write(new Blob([text]));
+      if (this.$refs.fileHandler) {
+        await (this.$refs.fileHandler as any).save(ableWriteStream)
+      } else {
+        await ableWriteStream.write(new Blob([text]));
+        // FileSystemDirectoryHandle.removeEntry()
+      }
       (await ableWriteStream.close) && ableWriteStream.close();
-      // FileSystemDirectoryHandle.removeEntry()
     },
     async deleteEntry() {
       this.currentActive.parent &&
