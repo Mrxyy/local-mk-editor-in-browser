@@ -7,16 +7,21 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 const root = ref<string>('body');
-const customEditor = ref(null);
+const customEditor = ref<HTMLElement | null>(null);
 onMounted(() => {
     root.value = ".v-md-editor-preview";
-    const el: HTMLElement = customEditor.value;
+    const el: HTMLElement | null = customEditor.value;
     if (el) {
-        nextTick(() => el.previousElementSibling.style.display = "none")
+        nextTick(() => (el.previousElementSibling as HTMLElement).classList.add("hidden"));
     }
     console.log(el);
-
+})
+onBeforeUnmount(() => {
+    const el: HTMLElement | null = customEditor.value;
+    if (el) {
+        (el.previousElementSibling as HTMLElement).classList.remove("hidden");
+    }
 })
 </script>

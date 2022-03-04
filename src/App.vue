@@ -26,8 +26,12 @@
         <div class="w-full">
           <v-md-editor :mode="editMode" @save="save" v-model="text" height="70vh"></v-md-editor>
           <customEditor v-if="isUseCustomEditor">
-            <div class="p-4" v-if="currentContext.fileType === 'xlsx'">
-              <sheetEditor :value="currentContext.fileObj" ref="fileHandler"></sheetEditor>
+            <div class="p-4" v-if="currentContext.fileType === 'sheet'">
+              <sheetEditor
+                :fileApplyRemoveHandler="currentUninstallFx"
+                :value="currentContext.fileObj"
+                ref="fileHandler"
+              ></sheetEditor>
             </div>
           </customEditor>
         </div>
@@ -59,6 +63,7 @@ interface dataResult {
   menuData: Array<MenuGenerator>;
   editMode: "edit" | "editable" | "preview";
   isUseCustomEditor: boolean;
+  currentUninstallFx?: Function;
   currentContext: CurrentContext;
 }
 
@@ -77,6 +82,7 @@ export default defineComponent({
       text: "mk-editor",
       menuData: [],
       isUseCustomEditor: false,
+      currentUninstallFx: undefined,
       currentContext: {
         fileType: "text",
         fileObj: null
@@ -87,7 +93,7 @@ export default defineComponent({
   computed: {
     currentActive(this: ComponentPublicInstance): MenuGenerator {
       return (this.$refs as any).moLeftListMenu.currentActive;
-    },
+    }
   },
   created() {
     var requestedBytes = 1024 * 1024 * 10; // 10MB
@@ -224,6 +230,7 @@ export default defineComponent({
       let type = Reflect.ownKeys(mime).find((v) => {
         return Reflect.get(mime, v).includes(file.type);
       });
+      this.isUseCustomEditor = false;
       if (!type && /\.md|\.ts|\.yaml|\.css|\.scss$/g.test(file.name)) {
         type = "text";
         if (/\.md$/g.test(file.name)) {
@@ -231,7 +238,7 @@ export default defineComponent({
         }
       } else if (/\.xlsx$/g.test(file.name)) {
         this.isUseCustomEditor = true;
-        type = "xlsx";
+        type = "sheet";
         nextTick(() => {
           this.handleCustomModeShow((this.$refs.fileHandler as any).editMode)
         })
@@ -253,7 +260,8 @@ export default defineComponent({
       switch (mode) {
         case (customMode.PREVIEWANDEDITOR):
           this.editMode = "editable";
-          (document.querySelector(".v-md-editor__editor-wrapper") as HTMLElement).style.display = "none";
+          (document.querySelector(".v-md-editor__editor-wrapper") as HTMLElement).classList.add("hidden");
+          this.currentUninstallFx = () => (document.querySelector(".v-md-editor__editor-wrapper") as HTMLElement).classList.remove("hidden");
           break
       }
     },

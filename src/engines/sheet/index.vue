@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+import { onUnmounted, ref, watchEffect } from 'vue';
 
 const props = defineProps<{
     value: File | Blob,
+    fileApplyRemoveHandler?: Function
 }>()
 
 async function save(writeAble: FileSystemWritableFileStream) {
@@ -43,12 +44,17 @@ watchEffect(async () => {
     /* write to the DOM at the end */
     (sheetEditor.value as HTMLElement).innerHTML = output.join("\n");
 })
+
+onUnmounted(() => props.fileApplyRemoveHandler && props.fileApplyRemoveHandler());
 </script>
 
 <style lang="scss" scoped>
 .sheetEditor:deep {
     table {
         border: 1px solid;
+        [contenteditable="true"] {
+            outline: none;
+        }
         td {
             border: 1px solid;
             padding: 5px;
