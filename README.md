@@ -25,6 +25,7 @@
 + js console、html、图片、pdf 预览。
 
 ## 执行中
-+ ~~excel 预览 done~~
++ ~~excel loader done~~
 + js console 
++ word loader
 + 插拔架构完成
