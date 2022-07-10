@@ -33,6 +33,13 @@
                 ref="fileHandler"
               ></sheetEditor>
             </div>
+            <div class="p-4" else-if="currentContext.fileType === 'word'">
+              <wordEditor
+                :fileApplyRemoveHandler="currentUninstallFx"
+                :value="currentContext.fileObj"
+                ref="fileHandler"
+              ></wordEditor>
+            </div>
           </customEditor>
         </div>
       </div>
@@ -49,6 +56,8 @@ import customEditor from "./engines/index.vue";
 import mime from "./mime.json";
 
 import sheetEditor from "./engines/sheet/index.vue"
+import wordEditor from "./engines/word/index.vue"
+
 
 declare const navigator: any;
 declare const webkitRequestFileSystem: any;
@@ -75,7 +84,8 @@ export default defineComponent({
   name: "App",
   components: {
     customEditor,
-    sheetEditor
+    sheetEditor,
+    wordEditor
   },
   data(): dataResult {
     return {
@@ -239,6 +249,12 @@ export default defineComponent({
       } else if (/\.xlsx$/g.test(file.name)) {
         this.isUseCustomEditor = true;
         type = "sheet";
+        nextTick(() => {
+          this.handleCustomModeShow((this.$refs.fileHandler as any).editMode)
+        })
+      }else if (/\.docx$/g.test(file.name)) {
+        this.isUseCustomEditor = true;
+        type = "word";
         nextTick(() => {
           this.handleCustomModeShow((this.$refs.fileHandler as any).editMode)
         })
