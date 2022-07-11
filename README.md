@@ -22,7 +22,7 @@
 
 ## 后期计划
 + 产品架构文档(system file,web stream,file system access)。
-+ js console、html、图片、pdf 预览。
++ js console、html、图片、pdf、excel、word 预览。
 
 ## 执行中
 + ~~excel loader done~~
