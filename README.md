@@ -27,5 +27,5 @@
 ## 执行中
 + ~~excel loader done~~
 + js console 
-+ word loader
++ ~~word loader~~
 + 插拔架构完成
